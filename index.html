@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClassicChat</title>
+  <meta name="description" content="A retro AI chat interface inspired by the early 2022–2023 era." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <button class="new-chat" id="newChatBtn" type="button" aria-label="Start a new chat">
+          <span class="plus">+</span>
+          <span>New chat</span>
+        </button>
+
+        <div class="history" id="historyList" aria-label="Chat history"></div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="side-action" id="resetBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v6h6"/></svg>
+          <span>Reset thread</span>
+        </button>
+        <button class="side-action" id="themeBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.7A8.2 8.2 0 1 1 11.3 3 6.4 6.4 0 0 0 21 12.7Z"/></svg>
+          <span>Dark mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <button class="mobile-menu" id="menuBtn" type="button" aria-label="Open menu">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+
+      <section class="welcome" id="welcomeView">
+        <h1>ClassicChat</h1>
+
+        <div class="intro-grid">
+          <section class="intro-column">
+            <div class="intro-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="3.25"></circle>
+                <path d="M12 2.75v2.1M12 19.15v2.1M21.25 12h-2.1M4.85 12h-2.1M18.55 5.45l-1.5 1.5M6.95 17.05l-1.5 1.5M18.55 18.55l-1.5-1.5M6.95 6.95l-1.5-1.5"></path>
+              </svg>
+            </div>
+            <h2>Examples</h2>
+            <button class="prompt-card" data-prompt="Explain quantum computing in simple terms">“Explain quantum computing in simple terms”</button>
+            <button class="prompt-card" data-prompt="Give me creative ideas for a 10 year old's birthday">“Got any creative ideas for a 10 year old’s birthday?”</button>
+            <button class="prompt-card" data-prompt="How do I make an HTTP request in JavaScript?">“How do I make an HTTP request in JavaScript?”</button>
+          </section>
+
+          <section class="intro-column">
+            <div class="intro-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M13.35 2.85 6.8 13h4.65l-.8 8.15L17.2 11h-4.65l.8-8.15Z"></path>
+              </svg>
+            </div>
+            <h2>Capabilities</h2>
+            <div class="info-card">Remembers what you said earlier in the conversation</div>
+            <div class="info-card">Allows you to provide follow-up corrections</div>
+            <div class="info-card">Built for simple, old-school text conversations</div>
+          </section>
+
+          <section class="intro-column">
+            <div class="intro-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M10.1 4.2 2.9 16.7a2.2 2.2 0 0 0 1.9 3.3h14.4a2.2 2.2 0 0 0 1.9-3.3L13.9 4.2a2.2 2.2 0 0 0-3.8 0Z"></path>
+                <path d="M12 9v4.4"></path>
+                <circle cx="12" cy="16.65" r=".7" class="icon-dot"></circle>
+              </svg>
+            </div>
+            <h2>Limitations</h2>
+            <div class="info-card">May occasionally generate incorrect information</div>
+            <div class="info-card">May occasionally produce unhelpful or biased answers</div>
+            <div class="info-card">Legacy models can have limited knowledge of newer events</div>
+          </section>
+        </div>
+      </section>
+
+      <section class="chat-view hidden" id="chatView" aria-live="polite"></section>
+
+      <div class="composer-area">
+        <form class="composer" id="chatForm">
+          <textarea id="messageInput" rows="1" placeholder="Send a message..." aria-label="Message"></textarea>
+          <button class="send-button" id="sendBtn" type="submit" aria-label="Send message">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 16 8-16 8 3-8-3-8Zm3 8h13"/></svg>
+          </button>
+        </form>
+        <p class="footer-note">ClassicChat may make mistakes. Check important information. Third-party project; not affiliated with or endorsed by OpenAI.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
