@@ -9,7 +9,6 @@ const menuBtn = document.getElementById('menuBtn');
 const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 const sidebarScrim = document.getElementById('sidebarScrim');
 const modelSelect = document.getElementById('modelSelect');
-const modelBadge = document.getElementById('modelBadge');
 
 const MODEL_LABELS = {
   'gpt-3.5-turbo': 'GPT-3.5 Turbo',
@@ -49,7 +48,6 @@ function getActiveChat() {
 
 function syncModelUI() {
   modelSelect.value = selectedModel;
-  modelBadge.textContent = MODEL_LABELS[selectedModel] || selectedModel;
 }
 
 function createChat() {
