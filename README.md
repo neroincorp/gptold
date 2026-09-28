@@ -25,3 +25,7 @@ Never put your API key in `index.html` or `app.js`, and do not commit `.env` pub
 ## Usage quota
 
 The included quota is a starter per-IP fixed-window limiter. Each visitor gets 10 messages in a 3-hour window, with a live countdown in the UI. The browser meter rejects stale same-window refreshes so the visible count does not jump backward and forward. For a larger public deployment or multiple server instances, move the quota store to Redis or another persistent database.
+
+
+## Usage limit persistence
+The 10-message / 3-hour quota is stored in a signed HttpOnly cookie as well as server memory, so the current window survives normal server restarts and redeploys for the same browser. For strong cross-device/IP enforcement at scale, use Redis or a database.

@@ -169,7 +169,9 @@ function paintUsage(usage, source = 'server') {
   usageReset.textContent = `• ${formatResetCountdown(usage.resetAt)}`;
   usageStrip.classList.toggle('low', usage.remaining > 0 && usage.remaining <= Math.max(3, Math.ceil(usage.limit * 0.2)));
   usageStrip.classList.toggle('empty', usage.remaining <= 0);
-  sendBtn.disabled = busy || usage.remaining <= 0;
+  // Keep the composer usable at zero. The server will return a clear quota
+  // message after the visitor tries to send, which feels more like old ChatGPT.
+  sendBtn.disabled = busy;
 }
 
 async function refreshUsage() {
@@ -211,7 +213,7 @@ function startUsageTimer() {
 }
 
 async function sendMessage(text) {
-  if (!text.trim() || busy || (usageState && usageState.remaining <= 0)) return;
+  if (!text.trim() || busy) return;
 
   busy = true;
   chatActivitySerial += 1;
@@ -253,7 +255,7 @@ async function sendMessage(text) {
   } finally {
     busy = false;
     chatActivitySerial += 1;
-    sendBtn.disabled = Boolean(usageState && usageState.remaining <= 0);
+    sendBtn.disabled = false;
     saveState();
     render();
     messageInput.focus();
@@ -263,7 +265,7 @@ async function sendMessage(text) {
 chatForm.addEventListener('submit', e => {
   e.preventDefault();
   const text = messageInput.value;
-  if (!text.trim() || busy || (usageState && usageState.remaining <= 0)) return;
+  if (!text.trim() || busy) return;
   messageInput.value = '';
   messageInput.style.height = 'auto';
   sendMessage(text);
