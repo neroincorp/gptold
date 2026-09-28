@@ -504,3 +504,8 @@ body.light .sidebar-close { color: #202123; }
   }
 
 }
+
+/* Unavailable models stay visible in the picker but cannot be selected. */
+.composer-model select option:disabled {
+  color: #777c86;
+}
