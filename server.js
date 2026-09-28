@@ -12,16 +12,15 @@ app.set('trust proxy', 1);
 app.use(express.json({ limit: '200kb' }));
 app.use(express.static(__dirname));
 
-// Starter abuse protection. For a larger public deployment, replace this
-// in-memory store with Redis / a database so quotas survive every redeploy
-// and can be shared across multiple server instances.
-const dailyUsage = new Map();
-const DAILY_MESSAGE_LIMIT = Math.max(1, Number(process.env.DAILY_MESSAGE_LIMIT || 30));
-const ALLOWED_MODELS = new Set(['gpt-3.5-turbo', 'gpt-5-nano']);
-
-function utcDayString(date = new Date()) {
-  return date.toISOString().slice(0, 10);
-}
+// Starter abuse protection. Each IP gets a fixed usage window that starts
+// when that visitor first loads/uses the site. For a larger public deployment,
+// move this store to Redis / a database so limits survive redeploys and can be
+// shared across multiple server instances.
+const usageWindows = new Map();
+const MESSAGE_LIMIT = Math.max(1, Number(process.env.MESSAGE_LIMIT || 10));
+const LIMIT_WINDOW_HOURS = Math.max(1, Number(process.env.LIMIT_WINDOW_HOURS || 3));
+const LIMIT_WINDOW_MS = LIMIT_WINDOW_HOURS * 60 * 60 * 1000;
+const ALLOWED_MODELS = new Set(['gpt-3.5-turbo']);
 
 function stableClientIp(req) {
   const forwarded = req.get('x-forwarded-for');
@@ -29,28 +28,31 @@ function stableClientIp(req) {
   return req.ip || req.socket?.remoteAddress || 'unknown';
 }
 
-function usageKey(req) {
-  return `${utcDayString()}:${stableClientIp(req)}`;
-}
+function getUsageWindow(req) {
+  const key = stableClientIp(req);
+  const now = Date.now();
+  let state = usageWindows.get(key);
 
-function nextResetAt() {
-  const now = new Date();
-  return new Date(Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate() + 1,
-    0, 0, 0, 0
-  )).toISOString();
+  if (!state || !Number.isFinite(state.resetAt) || now >= state.resetAt) {
+    state = {
+      used: 0,
+      resetAt: now + LIMIT_WINDOW_MS
+    };
+    usageWindows.set(key, state);
+  }
+
+  return { key, state };
 }
 
 function usageFor(req) {
-  const used = dailyUsage.get(usageKey(req)) || 0;
+  const { state } = getUsageWindow(req);
   return {
-    day: utcDayString(),
-    limit: DAILY_MESSAGE_LIMIT,
-    used,
-    remaining: Math.max(0, DAILY_MESSAGE_LIMIT - used),
-    resetAt: nextResetAt()
+    windowId: String(state.resetAt),
+    windowHours: LIMIT_WINDOW_HOURS,
+    limit: MESSAGE_LIMIT,
+    used: state.used,
+    remaining: Math.max(0, MESSAGE_LIMIT - state.used),
+    resetAt: new Date(state.resetAt).toISOString()
   };
 }
 
@@ -88,33 +90,24 @@ app.post('/api/chat', async (req, res) => {
       content: String(m.content || '').slice(0, 8000)
     }));
 
-    const key = usageKey(req);
-    const used = dailyUsage.get(key) || 0;
-    if (used >= DAILY_MESSAGE_LIMIT) {
+    const { state } = getUsageWindow(req);
+    if (state.used >= MESSAGE_LIMIT) {
       return res.status(429).json({
-        error: `Daily free limit reached (${DAILY_MESSAGE_LIMIT} messages).`,
+        error: `${MESSAGE_LIMIT}-message limit reached. Your messages reset every ${LIMIT_WINDOW_HOURS} hours.`,
         usage: usageFor(req)
       });
     }
 
-    // Reserve one message before contacting the upstream API. That prevents
-    // rapid repeated requests from slipping past the quota check.
-    dailyUsage.set(key, used + 1);
+    // Reserve one slot before contacting the upstream API so rapid repeated
+    // requests cannot slip past the quota check.
+    state.used += 1;
 
     const requestBody = {
       model,
-      messages: cleaned
+      messages: cleaned,
+      temperature: 0.8,
+      max_tokens: 700
     };
-
-    if (model === 'gpt-5-nano') {
-      // GPT-5 nano is a reasoning model. Minimal effort keeps this chat mode
-      // quick and inexpensive; max_completion_tokens includes reasoning tokens.
-      requestBody.reasoning_effort = 'minimal';
-      requestBody.max_completion_tokens = 1200;
-    } else {
-      requestBody.temperature = 0.8;
-      requestBody.max_tokens = 700;
-    }
 
     const upstream = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',

@@ -4,17 +4,19 @@ A retro, early-ChatGPT-inspired chat interface with a Node/Express backend.
 
 ## Models
 
-The built-in model picker supports:
+The built-in model picker currently allows:
 - `gpt-3.5-turbo`
-- `gpt-5-nano`
+
+`GPT-6 Astra` is shown in the selector as a disabled “Coming soon” option.
 
 ## Setup
 
 1. Run `npm install`.
 2. Put your OpenAI API key in `.env`:
    `OPENAI_API_KEY=your_key_here`
-3. Set the daily quota if desired:
-   `DAILY_MESSAGE_LIMIT=30`
+3. The included quota defaults to 10 messages every 3 hours:
+   `MESSAGE_LIMIT=10`
+   `LIMIT_WINDOW_HOURS=3`
 4. Run `npm start`.
 5. Open `http://localhost:3000`.
 
@@ -22,4 +24,4 @@ Never put your API key in `index.html` or `app.js`, and do not commit `.env` pub
 
 ## Usage quota
 
-The included quota is a starter per-IP daily limiter. The browser meter is protected against stale requests that could make the visible count jump backward/forward. For a larger public deployment or multiple server instances, move the quota store to Redis or another persistent database.
+The included quota is a starter per-IP fixed-window limiter. Each visitor gets 10 messages in a 3-hour window, with a live countdown in the UI. The browser meter rejects stale same-window refreshes so the visible count does not jump backward and forward. For a larger public deployment or multiple server instances, move the quota store to Redis or another persistent database.

@@ -11,8 +11,7 @@ const sidebarScrim = document.getElementById('sidebarScrim');
 const modelSelect = document.getElementById('modelSelect');
 
 const MODEL_LABELS = {
-  'gpt-3.5-turbo': 'GPT-3.5 Turbo',
-  'gpt-5-nano': 'GPT-5 nano'
+  'gpt-3.5-turbo': 'GPT-3.5 Turbo'
 };
 
 let chats = JSON.parse(localStorage.getItem('classicchat_chats') || '[]');
@@ -21,7 +20,7 @@ let selectedModel = localStorage.getItem('classicchat_model') || 'gpt-3.5-turbo'
 if (!MODEL_LABELS[selectedModel]) selectedModel = 'gpt-3.5-turbo';
 let busy = false;
 
-// Daily usage display state.
+// Usage display state.
 const usageStrip = document.getElementById('usageStrip');
 const usageText = document.getElementById('usageText');
 const usageReset = document.getElementById('usageReset');
@@ -154,10 +153,11 @@ function paintUsage(usage, source = 'server') {
 
   // The browser can have an older /api/usage request still in flight when a
   // message is sent. Never let a stale same-day response make the meter jump
-  // back upward. A new UTC day is allowed to reset the counter normally.
+  // Never let an older refresh for the same quota window make the counter
+  // jump upward. A new windowId is allowed to reset the count normally.
   if (
     usageState &&
-    usage.day && usageState.day === usage.day &&
+    usage.windowId && usageState.windowId === usage.windowId &&
     usage.remaining > usageState.remaining &&
     source === 'refresh'
   ) {
@@ -165,7 +165,7 @@ function paintUsage(usage, source = 'server') {
   }
 
   usageState = usage;
-  usageText.textContent = `${usage.remaining} of ${usage.limit} messages left today`;
+  usageText.textContent = `${usage.remaining} of ${usage.limit} messages left`;
   usageReset.textContent = `• ${formatResetCountdown(usage.resetAt)}`;
   usageStrip.classList.toggle('low', usage.remaining > 0 && usage.remaining <= Math.max(3, Math.ceil(usage.limit * 0.2)));
   usageStrip.classList.toggle('empty', usage.remaining <= 0);
