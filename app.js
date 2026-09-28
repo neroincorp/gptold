@@ -121,6 +121,7 @@ async function sendMessage(text) {
     });
 
     const data = await response.json().catch(() => ({}));
+    if (data.usage) paintUsage(data.usage);
     if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
 
     chat.messages.push({ role: 'assistant', content: data.message || 'No response returned.' });
@@ -131,7 +132,7 @@ async function sendMessage(text) {
     });
   } finally {
     busy = false;
-    sendBtn.disabled = false;
+    sendBtn.disabled = Boolean(usageState && usageState.remaining <= 0);
     saveState();
     render();
     messageInput.focus();
@@ -179,3 +180,63 @@ document.getElementById('themeBtn').addEventListener('click', () => document.bod
 document.getElementById('menuBtn').addEventListener('click', () => sidebar.classList.toggle('open'));
 
 render();
+
+// Daily usage display ---------------------------------------------------------
+const usageStrip = document.getElementById('usageStrip');
+const usageText = document.getElementById('usageText');
+const usageReset = document.getElementById('usageReset');
+const sidebarScrim = document.getElementById('sidebarScrim');
+let usageState = null;
+let usageTimer = null;
+
+function formatResetCountdown(resetAt) {
+  const ms = new Date(resetAt).getTime() - Date.now();
+  if (!Number.isFinite(ms) || ms <= 0) return 'resetting…';
+  const totalMinutes = Math.max(0, Math.floor(ms / 60000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0) return `resets in ${hours}h ${minutes}m`;
+  return `resets in ${minutes}m`;
+}
+
+function paintUsage(usage) {
+  if (!usage || typeof usage.remaining !== 'number') return;
+  usageState = usage;
+  usageText.textContent = `${usage.remaining} of ${usage.limit} messages left today`;
+  usageReset.textContent = `• ${formatResetCountdown(usage.resetAt)}`;
+  usageStrip.classList.toggle('low', usage.remaining > 0 && usage.remaining <= Math.max(3, Math.ceil(usage.limit * 0.2)));
+  usageStrip.classList.toggle('empty', usage.remaining <= 0);
+  if (usage.remaining <= 0) sendBtn.disabled = true;
+}
+
+async function refreshUsage() {
+  try {
+    const response = await fetch('/api/usage', { cache: 'no-store' });
+    if (!response.ok) return;
+    const usage = await response.json();
+    paintUsage(usage);
+  } catch (_) {
+    // Keep chat usable if the counter cannot load.
+  }
+}
+
+function startUsageTimer() {
+  clearInterval(usageTimer);
+  usageTimer = setInterval(() => {
+    if (!usageState) return;
+    usageReset.textContent = `• ${formatResetCountdown(usageState.resetAt)}`;
+    if (new Date(usageState.resetAt).getTime() <= Date.now()) refreshUsage();
+  }, 30000);
+}
+
+sidebarScrim?.addEventListener('click', () => sidebar.classList.remove('open'));
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 760) sidebar.classList.remove('open');
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') sidebar.classList.remove('open');
+});
+
+refreshUsage();
+startUsageTimer();

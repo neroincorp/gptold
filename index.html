@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>ClassicChat</title>
   <meta name="description" content="A retro AI chat interface inspired by the early 2022–2023 era." />
   <link rel="stylesheet" href="styles.css" />
@@ -32,9 +32,14 @@
     </aside>
 
     <main class="main-panel">
-      <button class="mobile-menu" id="menuBtn" type="button" aria-label="Open menu">
-        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
+      <header class="mobile-header">
+        <button class="mobile-menu" id="menuBtn" type="button" aria-label="Open menu">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="mobile-title">ClassicChat</div>
+        <div class="mobile-header-spacer" aria-hidden="true"></div>
+      </header>
+      <button class="sidebar-scrim" id="sidebarScrim" type="button" aria-label="Close menu"></button>
 
       <section class="welcome" id="welcomeView">
         <h1>ClassicChat</h1>
@@ -84,6 +89,10 @@
       <section class="chat-view hidden" id="chatView" aria-live="polite"></section>
 
       <div class="composer-area">
+        <div class="usage-strip" id="usageStrip" aria-live="polite">
+          <span id="usageText">Loading usage…</span>
+          <span class="usage-reset" id="usageReset"></span>
+        </div>
         <form class="composer" id="chatForm">
           <textarea id="messageInput" rows="1" placeholder="Send a message..." aria-label="Message"></textarea>
           <button class="send-button" id="sendBtn" type="submit" aria-label="Send message">

@@ -229,3 +229,174 @@ body.light .history-item.active { background: #d9d9e3; }
   .message-inner { width: calc(100% - 28px); gap: 13px; padding: 20px 0; }
   .footer-note { font-size: 9px; }
 }
+
+/* Usage meter */
+.usage-strip {
+  width: min(790px, 100%);
+  min-height: 22px;
+  margin: 0 auto 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #b7b7c2;
+  font-size: 11.5px;
+  line-height: 1.2;
+  text-align: center;
+}
+.usage-reset { color: #8e8ea0; }
+.usage-strip.low #usageText { color: #f0c36b; }
+.usage-strip.empty #usageText { color: #ef8f8f; }
+
+.mobile-header,
+.sidebar-scrim { display: none; }
+
+@media (max-width: 760px) {
+  html, body, .app-shell { height: 100dvh; min-height: 100dvh; }
+  body { overscroll-behavior: none; }
+
+  .main-panel { height: 100dvh; }
+
+  .mobile-header {
+    display: grid;
+    grid-template-columns: 42px 1fr 42px;
+    align-items: center;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    min-height: calc(52px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 10px 0;
+    background: rgba(52,53,65,.96);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    z-index: 26;
+    backdrop-filter: blur(10px);
+  }
+
+  .mobile-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-header-spacer { width: 42px; height: 42px; }
+
+  .mobile-menu {
+    display: grid;
+    place-items: center;
+    position: static;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #ececf1;
+  }
+  .mobile-menu:active { background: rgba(255,255,255,.08); }
+
+  .sidebar {
+    width: min(86vw, 320px);
+    min-width: 0;
+    padding-top: calc(9px + env(safe-area-inset-top));
+    padding-bottom: calc(9px + env(safe-area-inset-bottom));
+    z-index: 40;
+  }
+
+  .sidebar-scrim {
+    position: fixed;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    background: rgba(0,0,0,.48);
+    z-index: 35;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .sidebar.open + .main-panel .sidebar-scrim,
+  .sidebar.open ~ .main-panel .sidebar-scrim { opacity: 1; pointer-events: auto; }
+
+  .welcome {
+    padding: calc(82px + env(safe-area-inset-top)) 12px calc(146px + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
+  }
+  .welcome h1 {
+    margin-bottom: 30px;
+    font-size: 29px;
+  }
+  .intro-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    max-width: 520px;
+  }
+  .intro-column { width: 100%; }
+  .intro-column h2 { margin-bottom: 10px; }
+  .info-card, .prompt-card {
+    min-height: 52px;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .chat-view {
+    padding-top: calc(52px + env(safe-area-inset-top));
+    padding-bottom: calc(154px + env(safe-area-inset-bottom));
+    -webkit-overflow-scrolling: touch;
+  }
+  .message-inner {
+    width: 100%;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 12px;
+    padding: 18px 14px 20px;
+  }
+  .avatar { width: 28px; height: 28px; font-size: 12px; }
+  .message-content { font-size: 15px; line-height: 1.62; }
+  .message-content pre { max-width: 100%; overflow-x: auto; }
+
+  .composer-area {
+    padding: 10px 10px calc(8px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(52,53,65,0) 0%, rgba(52,53,65,.96) 24%, #343541 48%);
+  }
+  .usage-strip {
+    min-height: 19px;
+    margin-bottom: 5px;
+    font-size: 10.5px;
+    flex-wrap: wrap;
+    gap: 4px 7px;
+  }
+  .composer {
+    min-height: 48px;
+    border-radius: 7px;
+  }
+  .composer textarea {
+    font-size: 16px; /* prevents iOS Safari auto-zoom */
+    padding: 13px 12px 12px;
+    max-height: 128px;
+  }
+  .send-button {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+    margin-top: 4px;
+  }
+  .footer-note {
+    margin-top: 6px;
+    padding: 0 4px;
+    font-size: 9px;
+    line-height: 1.25;
+  }
+}
+
+@media (max-width: 380px) {
+  .welcome h1 { font-size: 27px; }
+  .welcome { padding-left: 10px; padding-right: 10px; }
+  .message-inner { padding-left: 11px; padding-right: 11px; }
+  .footer-note { font-size: 8.5px; }
+}
+
+body.light .mobile-header { background: rgba(247,247,248,.96); color: #202123; border-bottom-color: rgba(0,0,0,.08); }
+body.light .mobile-menu { color: #202123; }
+body.light .usage-strip { color: #6e6e80; }
+body.light .usage-reset { color: #8a8a98; }
