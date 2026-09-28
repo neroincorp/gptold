@@ -400,3 +400,121 @@ body.light .mobile-header { background: rgba(247,247,248,.96); color: #202123; b
 body.light .mobile-menu { color: #202123; }
 body.light .usage-strip { color: #6e6e80; }
 body.light .usage-reset { color: #8a8a98; }
+
+/* Model picker + reliable mobile drawer controls */
+.sidebar-mobile-head {
+  display: none;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 8px 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.sidebar-close {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #ececf1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.sidebar-close:hover,
+.sidebar-close:active { background: var(--sidebar-hover); }
+.sidebar-close svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.model-picker {
+  display: block;
+  margin: 8px 0 4px;
+}
+.model-picker-label {
+  display: block;
+  margin: 0 8px 6px;
+  color: #8e8ea0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.model-select-wrap {
+  position: relative;
+  display: block;
+}
+.model-select-wrap select {
+  width: 100%;
+  height: 40px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 6px;
+  outline: none;
+  background: #2a2b32;
+  color: #ececf1;
+  padding: 0 34px 0 11px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.model-select-wrap svg {
+  pointer-events: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #a7a7b1;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mobile-model-badge {
+  color: #a7a7b1;
+  font-weight: 400;
+  margin-left: 5px;
+}
+
+body.light .model-select-wrap select {
+  background: #fff;
+  color: #202123;
+  border-color: rgba(0,0,0,.12);
+}
+body.light .sidebar-close { color: #202123; }
+
+@media (max-width: 760px) {
+  .sidebar-mobile-head { display: flex; }
+
+  /* The body class is authoritative, so the backdrop doesn't depend on a
+     fragile sibling selector and is always tappable outside the drawer. */
+  body.sidebar-open .sidebar-scrim {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body:not(.sidebar-open) .sidebar-scrim {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sidebar {
+    width: min(88vw, 330px);
+    max-width: calc(100vw - 44px);
+  }
+
+  .sidebar-close {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .model-picker { margin-top: 8px; }
+}
